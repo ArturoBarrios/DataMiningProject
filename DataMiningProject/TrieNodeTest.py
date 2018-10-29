@@ -34,3 +34,5 @@ print(TrieNode.find_prefix(root,'Jews'))
 print(TrieNode.find_prefix(root,'C'))
 print(TrieNode.find_prefix(root,'Miks'))
 print(TrieNode.find_prefix(root,'big girl'))
+
+TrieNode.all_words_count(root)
