@@ -25,16 +25,34 @@ places_with_count = dict()
 topics_with_count = dict()
 uncommon_count = 20
 list_of_file_names = {"reut2-000.sgm"}
+# ,"reut2-001.sgm","reut2-002.sgm","reut2-003.sgm","reut2-004.sgm","reut2-005.sgm",
+#  "reut2-006.sgm","reut2-007.sgm","reut2-008.sgm","reut2-009.sgm","reut2-010.sgm","reut2-011.sgm","reut2-012.sgm",
+#  "reut2-013.sgm","reut2-014.sgm","reut2-015.sgm","reut2-016.sgm","reut2-017.sgm","reut2-018.sgm","reut2-019.sgm",
+#  "reut2-020.sgm","reut2-021.sgm"}
 irrelevant_words = []
 word_threshold = 10
+
+#uncommon words
+uncommon_name = "UNCOMMON_WORDS_LIST.txt"
+new_uncommon_words_file = open(uncommon_name,"r")
+new_uncommon_words = []
+new_uncommon_words_temp = []
+# for line in new_uncommon_words_file:
+#     new_uncommon_words.append(line)
+with open(uncommon_name,"r") as my_file:
+    new_uncommon_words_temp = my_file.read().splitlines()
+for w in new_uncommon_words_temp:
+    if w.strip() not in new_uncommon_words:
+        new_uncommon_words.append(w.strip())
+
+uncommon_words_count_t = dict()
+uncommon_words_count_p = dict()
+
+
+
+
+
 #return a list of words and their word count for each paragraphs
-#List of key values for each word in paragraph
-##
-# ,"reut2-001.sgm","reut2-001.sgm","reut2-002.sgm","reut2-003.sgm","reut2-004.sgm","reut2-005.sgm",
-# "reut2-006.sgm","reut2-007.sgm","reut2-008.sgm","reut2-009.sgm","reut2-010.sgm","reut2-011.sgm","reut2-012.sgm",
-# "reut2-013.sgm","reut2-014.sgm","reut2-015.sgm","reut2-016.sgm","reut2-017.sgm","reut2-018.sgm","reut2-019.sgm",
-# "reut2-020.sgm","reut2-021.sgm"}
-#go through every file
 for file_name in list_of_file_names:
 
     all_places = []
@@ -143,6 +161,18 @@ for file_name in list_of_file_names:
         words_count_in_para = dict()
         for word in words_copy:
             word = word.lower()
+
+            #get TOPIC: [uword: word:count,word2:count,....wordn:count
+                  #uword2: word:count,word2:count,....wordn:count]
+            # if(word in new_uncommon_words):
+            #     print("yaiiii")
+            #
+            #     values_temp = dict()
+            #     values_temp[word] = 1
+            #     for w,c in uncommon_words
+                # a = {k: values.get(k,0)+temp_dict.get(k,0) for k in set(values_temp)}
+                # uncommon_words_count["TOPIC: "+str(all_topics[paragraph_index])] =
+
             if word in words_count_in_para:
                 words_count_in_para[word]+=1
             else:
@@ -212,8 +242,7 @@ for k,v in words_count_dict.items():
     if v > word_threshold:
         irrelevant_words.append(k)
 
-print(irrelevant_words)
-
+#print(irrelevant_words)
 
 
 #get places with count
@@ -249,12 +278,29 @@ topics_words_count = dict()
 # for topic in distinct_topics:
 #     topics_words_count[topic] = 0
 
+#eric begin to put dictioanries(temp_irr_words_dict into uncommon_words_count_p
+temp_irr_words_dict = dict()
+for w in new_uncommon_words:
+    temp_irr_words_dict[w] = 0
+for place in distinct_places:
+    t = dict()
+    t = temp_irr_words_dict
+    uncommon_words_count_p[place] = t
+for topic in distinct_topics:
+    t = dict()
+    t = temp_irr_words_dict
+    uncommon_words_count_t[topic] = t
+#eric end to put dictioanries(temp_irr_words_dict into uncommon_words_count_p
+
 #get ditionary of most uncommon words for each topic and place
 for topic_place_list in words_for_each_paragraph:
+
     #k = PLACE: , TOPIC:
     #v = {word: word_count}
     for k,v in topic_place_list.items():
         for topic in distinct_topics:
+
+
             #check if topic is in key
             #add new words and count
             if topic in k:
@@ -267,7 +313,10 @@ for topic_place_list in words_for_each_paragraph:
                     temp_merged =  {k: topics_words_count[topic].get(k,0)+temp.get(k,0) for k in set(topics_words_count[topic])}
                     topics_words_count[topic] = temp_merged
         for place in distinct_places:
+
+
             if place in k:
+
                 if place not in places_words_count:
                     places_words_count[place] = v
                 else:
@@ -275,16 +324,43 @@ for topic_place_list in words_for_each_paragraph:
                     temp = v
                     temp_merged =  {k: places_words_count[place].get(k,0)+temp.get(k,0) for k in set(places_words_count[place])}
                     places_words_count[place] = temp_merged
+
+
 #find top 10 words for each places
 for k,v in places_words_count.items():
+
     #v = {word:count}
     #for k2,v2 in v.items():
-    print(k)
     uncommon = sorted(v.items(),key=operator.itemgetter(1))
     uncommon_words = []
+    place = k
+    # print(uncommon)
+    # print("\n")
     for w,c in uncommon:
         uncommon_words.append(w)
+        #new
+        if w in new_uncommon_words:
+            #print("w: ", w)
+            temp = {w:1}
+            temp2 = {}
 
+            #temp2 = dict()
+
+            #print(temp2)
+            # print("\n\n\n\n")
+            # print("temp: ",temp)
+            # print("\n")
+            # print("places_wordds_count: ",uncommon_words_count_p[place])
+            # print("\n\n\n\n")
+#eric begin
+            uncommon_words_count_p[place] = {k2: uncommon_words_count_p[place].get(k2,0)+temp.get(k,0) for k2 in set(uncommon_words_count_p[place])|set(temp)}
+
+            # print("\n\n\n\n")
+#eric end
+
+
+
+    # print("\n")
     i = 0
     current_uncommon_count = 0
     found = False
@@ -305,6 +381,7 @@ for k,v in places_words_count.items():
         i+=1
 
 
+
 #find top 10 words for topics
 for k,v in topics_words_count.items():
     #v = {word:count}
@@ -312,8 +389,16 @@ for k,v in topics_words_count.items():
     uncommon = sorted(v.items(),key=operator.itemgetter(1))
     topics_uncommon_words[k] = uncommon[0]
     uncommon_words = []
+    topic = k
     for w,c in uncommon:
         uncommon_words.append(w)
+
+        if w in new_uncommon_words:
+        #     #print("w: ", uncommon_words_count_p[k])
+        #     temp = dict()
+        #     temp[w] = 1
+        #     temp_merged = {k: uncommon_words_count_t[topic].get(k,0)+temp.get(k,0) for k in set(uncommon_words_count_t[topic])}
+            uncommon_words_count_t[topic][w] += 1
     i = 0
     current_uncommon_count = 0
     found = False
@@ -338,11 +423,34 @@ for k,v in topics_words_count.items():
     #     topics_uncommon_words[k] += uncommon[i]
     #     i+=1
 
+#topic
+# for w in new_uncommon_words:
+#     print(w)
+# print (len(new_uncommon_words))
+#
+#
 
 
-print(irrelevant_words)
+# for k,v in uncommon_words_count_p.items():
+#     #print(k,v)
+#     for k2,v2 in uncommon_words_count_p[k].items():
+#         #print(k2,v2)
+#         if(v2>0):
+#             print(k2,v2,end=' ')
+#     print("\n")
+#
+# print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
+#
+# for k,v in uncommon_words_count_t.items():
+#     #print(k,v)
+#     for k2,v2 in uncommon_words_count_t[k].items():
+#         print(v2,end=' ')
+#     print("")
+    #print(" ")
 
-test_word_count = 0
+# print(irrelevant_words)
+#
+# test_word_count = 0
 # print("topics_places_word_count: ")
 # for k, v in topics_places_word_count.items():
 #     print (k, ": ",v)
@@ -371,7 +479,7 @@ test_word_count = 0
 # for k,v in topics_uncommon_words.items():
 #     print (k,":",v)
 #     print(" ")
-
+#
 #
 # #get count of each topic and each places
 #
