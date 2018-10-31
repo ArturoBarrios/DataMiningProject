@@ -279,17 +279,20 @@ topics_words_count = dict()
 #     topics_words_count[topic] = 0
 
 #eric begin to put dictioanries(temp_irr_words_dict into uncommon_words_count_p
-temp_irr_words_dict = dict()
-for w in new_uncommon_words:
-    temp_irr_words_dict[w] = 0
+
+
 for place in distinct_places:
-    t = dict()
-    t = temp_irr_words_dict
-    uncommon_words_count_p[place] = t
+    temp_irr_words_dict = dict()
+    for w in new_uncommon_words:
+        temp_irr_words_dict[w] = 0
+
+    uncommon_words_count_p[place] = temp_irr_words_dict
+
 for topic in distinct_topics:
-    t = dict()
-    t = temp_irr_words_dict
-    uncommon_words_count_t[topic] = t
+    temp_irr_words_dict = dict()
+    for w in new_uncommon_words:
+        temp_irr_words_dict[w] = 0
+    uncommon_words_count_t[topic] = temp_irr_words_dict
 #eric end to put dictioanries(temp_irr_words_dict into uncommon_words_count_p
 
 #get ditionary of most uncommon words for each topic and place
@@ -333,7 +336,7 @@ for k,v in places_words_count.items():
     #for k2,v2 in v.items():
     uncommon = sorted(v.items(),key=operator.itemgetter(1))
     uncommon_words = []
-    place = k
+    count = 0
     # print(uncommon)
     # print("\n")
     for w,c in uncommon:
@@ -345,7 +348,7 @@ for k,v in places_words_count.items():
             temp2 = {}
 
             #temp2 = dict()
-
+            place = k
             #print(temp2)
             # print("\n\n\n\n")
             # print("temp: ",temp)
@@ -353,8 +356,14 @@ for k,v in places_words_count.items():
             # print("places_wordds_count: ",uncommon_words_count_p[place])
             # print("\n\n\n\n")
 #eric begin
-            uncommon_words_count_p[place] = {k2: uncommon_words_count_p[place].get(k2,0)+temp.get(k,0) for k2 in set(uncommon_words_count_p[place])|set(temp)}
-
+            #uncommon_words_count_p[place] = {k2: uncommon_words_count_p[place].get(k2,0)+temp.get(k,0) for k2 in set(uncommon_words_count_p[place])|set(temp)}
+            if w in new_uncommon_words:
+            #     #print("w: ", uncommon_words_count_p[k])
+            #     temp = dict()
+            #     temp[w] = 1
+            #     temp_merged = {k: uncommon_words_count_t[topic].get(k,0)+temp.get(k,0) for k in set(uncommon_words_count_t[topic])}
+                uncommon_words_count_p[place][w] += 1
+            count+=1
             # print("\n\n\n\n")
 #eric end
 
@@ -431,13 +440,13 @@ for k,v in topics_words_count.items():
 #
 
 
-# for k,v in uncommon_words_count_p.items():
-#     #print(k,v)
-#     for k2,v2 in uncommon_words_count_p[k].items():
-#         #print(k2,v2)
-#         if(v2>0):
-#             print(k2,v2,end=' ')
-#     print("\n")
+for k,v in uncommon_words_count_p.items():
+    #print(k,v)
+    for k2,v2 in uncommon_words_count_p[k].items():
+        #print(k2,v2)
+        if(v2>0):
+            print("output: ",k2,v2,end=' ')
+    print("\n\n")
 #
 # print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
 #
