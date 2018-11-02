@@ -24,7 +24,7 @@ wfep_count = 0
 places_with_count = dict()
 topics_with_count = dict()
 uncommon_count = 20
-list_of_file_names = {"reut2-000.sgm"}
+list_of_file_names = {"reut2-001.sgm"}
 # ,"reut2-001.sgm","reut2-002.sgm","reut2-003.sgm","reut2-004.sgm","reut2-005.sgm",
 #  "reut2-006.sgm","reut2-007.sgm","reut2-008.sgm","reut2-009.sgm","reut2-010.sgm","reut2-011.sgm","reut2-012.sgm",
 #  "reut2-013.sgm","reut2-014.sgm","reut2-015.sgm","reut2-016.sgm","reut2-017.sgm","reut2-018.sgm","reut2-019.sgm",
@@ -94,19 +94,16 @@ for file_name in list_of_file_names:
             all_topics_unformatted.append(" ")
 
 
+
+
     #put unformatted places into all_places
     for topic in all_topics_unformatted:
-        if(topic==''):
-            topic = ['']
         topic = "".join(str(topic[0]))
         topic = re.findall(r"<D>(.*?)</D>|z",topic)
         t_string = ""
         if topic:
             for t in topic:
                 t_string+=(t+",")
-                #put into distinct topics list
-                if t not in distinct_topics:
-                    distinct_topics.append(t)
         else:
             t_string = "z"
         all_topics.append(t_string)
@@ -115,20 +112,12 @@ for file_name in list_of_file_names:
 
     #put unformatted places into all_places
     for place in all_places_unformatted:
-
-        if(place==''):
-            place = ['']
-
         place = "".join(str(place[0]))
         place = re.findall(r"<D>(.*?)</D>|z",place)
         p_string = ""
         if place:
             for p in place:
                 p_string+=(p+",")
-                #put into distinct places list
-                if p not in distinct_places:
-                    distinct_places.append(p)
-
         else:
             p_string = "z"
         all_places.append(p_string)
@@ -137,83 +126,86 @@ for file_name in list_of_file_names:
 
     #get each paragraph in file
     for p in paragraphs_unformatted:
-        # p = str(p)
-        # p = p.replace("\\n"," ")
 
-        paragraphs.append(p[0])
+        p = str(p)
+        p = p.replace("\\n"," ")
+
+        paragraphs.append(p)
+    #print(paragraphs)
+    #print("\n\n\n\n\n")
+    # print(len(paragraphs))
+
+    #newest shit
+
+    places = re.findall(r'<PLACES>(.*?)</PLACES>|<PLACES></PLACES>',content)
 
 
-    #end of newest shit
-
-    # places = re.findall(r'<PLACES>(.*?)</PLACES>|<PLACES></PLACES>',content)
-    #
-    #
-    # #recently added
-    # index = 0
-    # while index<len(places):
-    #     temp_places = "".join(str(places[index]))
-    #     places[index] = re.findall(r"<D>(.*?)</D>|z",temp_places)
-    #     index+=1
+    #recently added
+    index = 0
+    while index<len(places):
+        temp_places = "".join(str(places[index]))
+        places[index] = re.findall(r"<D>(.*?)</D>|z",temp_places)
+        index+=1
 
     #put places in prefix tree
-    # p_count = 0
-    # for place in places:
-    #     #print(place)
-    #     if place:
-    #         p_string = ""
-    #         for p in place:
-    #             p_string+=(p+",")
-    #             TrieNode.add(root,p)
-    #             if p not in distinct_places:
-    #                 distinct_places.append(p)
-    #         p_count+=1
-    #         all_places.append(p_string);
-    #
-    #     else:
-    #         np_places_count+=1
-    #         all_places.append("z")
-    #         p_count+=1
+    p_count = 0
+    for place in places:
+        #print(place)
+        if place:
+            p_string = ""
+            for p in place:
+                p_string+=(p+",")
+                TrieNode.add(root,p)
+                if p not in distinct_places:
+                    distinct_places.append(p)
+            p_count+=1
+            all_places.append(p_string);
+
+        else:
+            np_places_count+=1
+            all_places.append("z")
+            p_count+=1
 
 
 
 
 
     #find all unique TOPICS
-    # topics = re.findall(r'<TOPICS>(.*?)</TOPICS>|<TOPICS></TOPICS>',content)
-    # topics_new = ""
-    # for e in topics:
-    #     if e == '':
-    #         topics_new+="z"
-    #     else:
-    #         topics_new += e
-    #
-    # #recently added
-    # index = 0
-    # while index<len(topics):
-    #     temp_topics = "".join(str(topics[index]))
-    #     topics[index] = re.findall(r"<D>(.*?)</D>|z",temp_topics)
-    #     index+=1
+    topics = re.findall(r'<TOPICS>(.*?)</TOPICS>|<TOPICS></TOPICS>',content)
+    topics_new = ""
+    for e in topics:
+        if e == '':
+            topics_new+="z"
+        else:
+            topics_new += e
+
+    #recently added
+    index = 0
+    while index<len(topics):
+        temp_topics = "".join(str(topics[index]))
+        topics[index] = re.findall(r"<D>(.*?)</D>|z",temp_topics)
+        index+=1
     #recently added
     #topics = "".join(str(e) for e in topics_new)
     #topics = re.findall(r"<D>(.*?)</D>|z",topics)
 
     #put topics in prefix tree
-    # for topic in topics:
-    #     if topic:
-    #         t_string = ""
-    #         for t in topic:
-    #             t_string+=(t+",")
-    #             TrieNode.add(root,topic)
-    #             if t not in distinct_topics:
-    #                 distinct_topics.append(t)
-    #         all_topics.append(t_string)
-    #     else:
-    #         nt_topics_count+=1
-    #         all_topics.append("")
+    for topic in topics:
+        if topic:
+            t_string = ""
+            for t in topic:
+                t_string+=(t+",")
+                TrieNode.add(root,topic)
+                if t not in distinct_topics:
+                    distinct_topics.append(t)
+            all_topics.append(t_string)
+        else:
+            nt_topics_count+=1
+            all_topics.append("")
 
 
     #get each paragraph in <BODY> tag
-    #paragraphs = re.findall(r'<BODY.*?>([\s\S]*?)</BODY>',content)
+    paragraphs = re.findall(r'<BODY.*?>([\s\S]*?)</BODY>',content)
 
     #put each word in words list
     words = []
@@ -232,11 +224,14 @@ for file_name in list_of_file_names:
         #print(paragraph_index, "\n",paragraph)
         #print("\n\n\n\n\n\n\n")
         words_copy = re.findall(r'\b([a-zA-Z]+)\b',paragraph)
-        #print(words_copy)
+        print(words_copy)
         words.extend(words_copy)
         word_list.extend(words_copy)
         #arti
 
+        # print("PLACE: "+str(all_places[paragraph_index])+" TOPIC: "+ str(all_topics[paragraph_index]))
+        # print(paragraph)
+        # print("\n\n\n\n\n\n\n")
         #topics and places with word count
         if "PLACE: "+str(all_places[paragraph_index])+" TOPIC: "+ str(all_topics[paragraph_index]) not in topics_places_word_count:
             topics_places_word_count["PLACE: "+str(all_places[paragraph_index])+" TOPIC: "+ str(all_topics[paragraph_index])] = len(words_copy)
@@ -421,11 +416,15 @@ for topic_place_list in words_for_each_paragraph:
 #find top 10 words for each places
 for k,v in places_words_count.items():
 
+    #v = {word:count}
+    #for k2,v2 in v.items():
 
     uncommon = sorted(v.items(),key=operator.itemgetter(1))
     uncommon_words = []
     count = 0
 
+    # print(uncommon)
+    # print("\n")
     for w,c in uncommon:
 
         uncommon_words.append(w)
@@ -434,9 +433,22 @@ for k,v in places_words_count.items():
             #print("w: ", w)
             temp = {w:1}
             temp2 = {}
-            place = k
 
+            #temp2 = dict()
+            place = k
+            #print(temp2)
+            # print("\n\n\n\n")
+            # print("temp: ",temp)
+            # print("\n")
+            # print("places_wordds_count: ",uncommon_words_count_p[place])
+            # print("\n\n\n\n")
+#ericericeric begin
+            #uncommon_words_count_p[place] = {k2: uncommon_words_count_p[place].get(k2,0)+temp.get(k,0) for k2 in set(uncommon_words_count_p[place])|set(temp)}
             if w in new_uncommon_words:
+            #     #print("w: ", uncommon_words_count_p[k])
+            #     temp = dict()
+            #     temp[w] = 1
+            #     temp_merged = {k: uncommon_words_count_t[topic].get(k,0)+temp.get(k,0) for k in set(uncommon_words_count_t[topic])}
                 uncommon_words_count_p[place][w] += c
 
             count+=1
@@ -477,10 +489,13 @@ for k,v in topics_words_count.items():
     topic = k
     for w,c in uncommon:
         uncommon_words.append(w)
-        if w in new_uncommon_words:
-            if w in new_uncommon_words:
-                uncommon_words_count_t[topic][w]+=c
 
+        if w in new_uncommon_words:
+        #     #print("w: ", uncommon_words_count_p[k])
+        #     temp = dict()
+        #     temp[w] = 1
+        #     temp_merged = {k: uncommon_words_count_t[topic].get(k,0)+temp.get(k,0) for k in set(uncommon_words_count_t[topic])}
+            uncommon_words_count_t[topic][w] += 1
     i = 0
     current_uncommon_count = 0
     found = False
@@ -506,32 +521,30 @@ for k,v in topics_words_count.items():
     #     i+=1
 
 #topic
-for w in new_uncommon_words:
-    print(w)
-print (len(new_uncommon_words))
+# for w in new_uncommon_words:
+#     print(w)
+# print (len(new_uncommon_words))
+#
+#
 
 
-
-
-for k,v in uncommon_words_count_p.items():
-    print(k)
-    for k2,v2 in uncommon_words_count_p[k].items():
-
-        print(v2, end=' ')
-
-    print("\n\n")
-
-print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
-print (len(new_uncommon_words))
-
-
-for k,v in uncommon_words_count_t.items():
-    print(k)
-    for k2,v2 in uncommon_words_count_t[k].items():
-        print(v2,end=' ')
-    print("")
-    print(" ")
-print(len(new_uncommon_words))
+# for k,v in uncommon_words_count_p.items():
+#
+#     if(k=="cayman-islands"):
+#         for k2,v2 in uncommon_words_count_p[k].items():
+#             print(v2, end=' ')
+        # if(v2>0):
+        #     print("output: ",k," word: ",k2,": ",v2,end=' ')
+    #print("\n\n")
+#
+# print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
+#
+# for k,v in uncommon_words_count_t.items():
+#     #print(k,v)
+#     for k2,v2 in uncommon_words_count_t[k].items():
+#         print(v2,end=' ')
+#     print("")
+    #print(" ")
 
 # print(irrelevant_words)
 #
