@@ -1,29 +1,39 @@
+from __future__ import print_function
+
+from sklearn.datasets import make_blobs
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_samples, silhouette_score
+
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import numpy as np
+import loader
+
 print(__doc__)
 
-import time
-
-import numpy as np
-import matplotlib.pyplot as plt
-
-from sklearn.cluster import MiniBatchKMeans, KMeans
-from sklearn.metrics.pairwise import pairwise_distances_argmin
-from sklearn.datasets.samples_generator import make_blobs
-import loader
-# #############################################################################
-# Generate sample data
-np.random.seed(0)
-
-batch_size = 45
-centers = [[1, 1], [-1, -1], [1, -1]]
-n_clusters = len(centers)
-
-# X, labels_true = make_blobs(n_samples=3000, centers=centers, cluster_std=0.7)
+# Generating the sample data from make_blobs
+# This particular setting has one distinct cluster and 3 clusters placed close
+# together.
+# X, y = make_blobs(n_samples=500,
+#                   n_features=2,
+#                   centers=4,
+#                   cluster_std=1,
+#                   center_box=(-10.0, 10.0),
+#                   shuffle=True,
+#                   random_state=1)  # For reproducibility
+# print("X:   ",X)
+# print('\n\n\n\n\n\n')
+# print("Y      ",y)
+##########XY
 x_labels = []
 f = open("p_xlabels.txt","r")
 line = f.read()
+#x_labels = {"SepalLengthCm","SepalWidthCm","PetalLengthCm","PetalWidthCm"}
 for label in line.split(","):
     x_labels.append(label[1:len(label)-1])
-X, labels_true, type2id = loader.load_data('Iris_p.csv', y_label="Species", x_labels=x_labels)
+X, y, type2id = loader.load_data('Iris_p.csv', y_label="Species", x_labels=x_labels)
+
+
 summation_X = []
 summation_Y = []
 for vector in X:
@@ -36,87 +46,98 @@ for vector in X:
     index+=1
     temp = []
     temp.append(result)
+    temp.append(1)
     summation_X.append(temp)
 
-summation_X = np.array([np.array(xi)for xi in summation_X])
-# #############################################################################
-# Compute clustering with Means
+X = np.array([np.array(xi)for xi in summation_X])
 
-k_means = KMeans(init='random', n_clusters=3, n_init=10)
-t0 = time.time()
-k_means.fit(summation_X)
-t_batch = time.time() - t0
+######XY
 
-# #############################################################################
-# Compute clustering with MiniBatchKMeans
+range_n_clusters = [2, 3, 4,5,6]
 
-mbk = MiniBatchKMeans(init='k-means++', n_clusters=3, batch_size=batch_size,
-                      n_init=10, max_no_improvement=10, verbose=0)
-t0 = time.time()
-mbk.fit(summation_X)
-t_mini_batch = time.time() - t0
-#
-# #############################################################################
-# Plot result
+for n_clusters in range_n_clusters:
+    # Create a subplot with 1 row and 2 columns
+    fig, (ax1, ax2) = plt.subplots(1, 2)
+    fig.set_size_inches(18, 7)
 
-fig = plt.figure(figsize=(8, 3))
-fig.subplots_adjust(left=0.02, right=0.98, bottom=0.05, top=0.9)
-colors = ['#4EACC5', '#FF9C34', '#4E9A06']
+    # The 1st subplot is the silhouette plot
+    # The silhouette coefficient can range from -1, 1 but in this example all
+    # lie within [-0.1, 1]
+    ax1.set_xlim([-0.1, 1])
+    # The (n_clusters+1)*10 is for inserting blank space between silhouette
+    # plots of individual clusters, to demarcate them clearly.
+    ax1.set_ylim([0, len(X) + (n_clusters + 1) * 10])
 
-# We want to have the same colors for the same cluster from the
-# MiniBatchKMeans and the KMeans algorithm. Let's pair the cluster centers per
-# closest one.
-k_means_cluster_centers = np.sort(k_means.cluster_centers_, axis=0)
-mbk_means_cluster_centers = np.sort(mbk.cluster_centers_, axis=0)
-k_means_labels = pairwise_distances_argmin(summation_X, k_means_cluster_centers)
-mbk_means_labels = pairwise_distances_argmin(summation_X, mbk_means_cluster_centers)
-order = pairwise_distances_argmin(k_means_cluster_centers,
-                                  mbk_means_cluster_centers)
+    # Initialize the clusterer with n_clusters value and a random generator
+    # seed of 10 for reproducibility.
+    clusterer = KMeans(n_clusters=n_clusters, random_state=10)
+    cluster_labels = clusterer.fit_predict(X)
 
-# KMeans
-ax = fig.add_subplot(1, 3, 1)
-for k, col in zip(range(n_clusters), colors):
-    my_members = k_means_labels == k
-    cluster_center = k_means_cluster_centers[k]
-    ax.plot(summation_X, 'w',
-            markerfacecolor=col, marker='.')
-    ax.plot(summation_X, 'o', markerfacecolor=col,
-            markeredgecolor='k', markersize=6)
-ax.set_title('KMeans')
-ax.set_xticks(())
-ax.set_yticks(())
-plt.text(-3.5, 1.8,  'train time: %.2fs\ninertia: %f' % (
-    t_batch, k_means.inertia_))
+    # The silhouette_score gives the average value for all the samples.
+    # This gives a perspective into the density and separation of the formed
+    # clusters
+    silhouette_avg = silhouette_score(X, cluster_labels)
+    print("For n_clusters =", n_clusters,
+          "The average silhouette_score is :", silhouette_avg)
 
-# # MiniBatchKMeans
-# ax = fig.add_subplot(1, 3, 2)
-# for k, col in zip(range(n_clusters), colors):
-#     my_members = mbk_means_labels == order[k]
-#     cluster_center = mbk_means_cluster_centers[order[k]]
-#     ax.plot(X[my_members, 0], X[my_members, 1], 'w',
-#             markerfacecolor=col, marker='.')
-#     ax.plot(cluster_center[0], cluster_center[1], 'o', markerfacecolor=col,
-#             markeredgecolor='k', markersize=6)
-# ax.set_title('MiniBatchKMeans')
-# ax.set_xticks(())
-# ax.set_yticks(())
-# plt.text(-3.5, 1.8, 'train time: %.2fs\ninertia: %f' %
-#          (t_mini_batch, mbk.inertia_))
-#
-# # Initialise the different array to all False
-# different = (mbk_means_labels == 4)
-# ax = fig.add_subplot(1, 3, 3)
-#
-# for k in range(n_clusters):
-#     different += ((k_means_labels == k) != (mbk_means_labels == order[k]))
-#
-# identic = np.logical_not(different)
-# ax.plot(X[identic, 0], X[identic, 1], 'w',
-#         markerfacecolor='#bbbbbb', marker='.')
-# ax.plot(X[different, 0], X[different, 1], 'w',
-#         markerfacecolor='m', marker='.')
-# ax.set_title('Difference')
-# ax.set_xticks(())
-# ax.set_yticks(())
+    # Compute the silhouette scores for each sample
+    sample_silhouette_values = silhouette_samples(X, cluster_labels)
+
+    y_lower = 10
+    for i in range(n_clusters):
+        # Aggregate the silhouette scores for samples belonging to
+        # cluster i, and sort them
+        ith_cluster_silhouette_values = \
+            sample_silhouette_values[cluster_labels == i]
+
+        ith_cluster_silhouette_values.sort()
+
+        size_cluster_i = ith_cluster_silhouette_values.shape[0]
+        y_upper = y_lower + size_cluster_i
+
+        color = cm.nipy_spectral(float(i) / n_clusters)
+        ax1.fill_betweenx(np.arange(y_lower, y_upper),
+                          0, ith_cluster_silhouette_values,
+                          facecolor=color, edgecolor=color, alpha=0.7)
+
+        # Label the silhouette plots with their cluster numbers at the middle
+        ax1.text(-0.05, y_lower + 0.5 * size_cluster_i, str(i))
+
+        # Compute the new y_lower for next plot
+        y_lower = y_upper + 10  # 10 for the 0 samples
+
+    ax1.set_title("The silhouette plot for the various clusters.")
+    ax1.set_xlabel("The silhouette coefficient values")
+    ax1.set_ylabel("Cluster label")
+
+    # The vertical line for average silhouette score of all the values
+    ax1.axvline(x=silhouette_avg, color="red", linestyle="--")
+
+    ax1.set_yticks([])  # Clear the yaxis labels / ticks
+    ax1.set_xticks([-0.1, 0, 0.2, 0.4, 0.6, 0.8, 1])
+
+    # 2nd Plot showing the actual clusters formed
+    colors = cm.nipy_spectral(cluster_labels.astype(float) / n_clusters)
+    ax2.scatter(X[:,0],X[:,1], marker='.', s=30, lw=0, alpha=0.7,
+                c=colors, edgecolor='k')
+
+    # Labeling the clusters
+    centers = clusterer.cluster_centers_
+    print("CENTERS: ",centers    )
+    # Draw white circles at cluster centers
+    ax2.scatter(centers[:, 0], centers[:, 1], marker='o',
+                c="white", alpha=1, s=200, edgecolor='k')
+
+    for i, c in enumerate(centers):
+        ax2.scatter(c[0], c[1], marker='$%d$' % i, alpha=1,
+                    s=50, edgecolor='k')
+
+    ax2.set_title("The visualization of the clustered data.")
+    ax2.set_xlabel("Feature space for the 1st feature")
+    ax2.set_ylabel("Feature space for the 2nd feature")
+
+    plt.suptitle(("Silhouette analysis for KMeans clustering on sample data "
+                  "with n_clusters = %d" % n_clusters),
+                 fontsize=14, fontweight='bold')
 
 plt.show()
