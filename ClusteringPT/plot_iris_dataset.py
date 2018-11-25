@@ -31,12 +31,12 @@ import loader
 
 
 x_labels = []
-f = open("p_xlabels.txt","r")
+f = open("t_xlabels.txt","r")
 line = f.read()
 for label in line.split(","):
     x_labels.append(label[1:len(label)-1])
 # x_labels = {"SepalLengthCm","SepalWidthCm","PetalLengthCm","PetalWidthCm"}
-X, y, type2id = loader.load_data('Iris_p.csv', y_label="Species", x_labels=x_labels)
+X, y, type2id = loader.load_data('Iris_t.csv', y_label="Species", x_labels=x_labels)
 
 summation_X = []
 summation_Y = []
@@ -92,7 +92,7 @@ fig = plt.figure(1, figsize=(8, 6))
 ax = Axes3D(fig, elev=-150, azim=110)
 components = len(X[0])
 print(components)
-X_reduced = PCA(n_components=147).fit_transform(X)
+X_reduced = PCA(n_components=119).fit_transform(X)
 ax.scatter(summation_X,0, c=y,
            cmap=plt.cm.Set1, edgecolor='k',s=40)
 ax.set_title("First three PCA directions")

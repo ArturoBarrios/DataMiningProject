@@ -13,12 +13,12 @@ import loader
 centers = [[1, 1], [-1, -1], [1, -1]]
 
 x_labels = []
-f = open("p_xlabels.txt","r")
+f = open("t_xlabels.txt","r")
 line = f.read()
 #x_labels = {"SepalLengthCm","SepalWidthCm","PetalLengthCm","PetalWidthCm"}
 for label in line.split(","):
     x_labels.append(label[1:len(label)-1])
-X, labels_true, type2id = loader.load_data('Iris_p.csv', y_label="Species", x_labels=x_labels)
+X, labels_true, type2id = loader.load_data('Iris_t.csv', y_label="Species", x_labels=x_labels)
 
 
 summation_X = []
@@ -46,7 +46,7 @@ summation_X = np.array([np.array(xi)for xi in summation_X])
 
 # #############################################################################
 # Compute DBSCAN
-db = DBSCAN(eps=3, min_samples=10).fit(summation_X)
+db = DBSCAN(eps=2, min_samples=10).fit(summation_X)
 core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
 core_samples_mask[db.core_sample_indices_] = True
 labels = db.labels_
