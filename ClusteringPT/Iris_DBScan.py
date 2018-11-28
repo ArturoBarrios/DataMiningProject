@@ -46,11 +46,10 @@ summation_X = np.array([np.array(xi)for xi in summation_X])
 
 # #############################################################################
 # Compute DBSCAN
-db = DBSCAN(eps=2, min_samples=10).fit(summation_X)
+db = DBSCAN(eps=3, min_samples=2).fit(summation_X)
 core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
 core_samples_mask[db.core_sample_indices_] = True
 labels = db.labels_
-print(len(labels_true))
 i = 0
 
 
@@ -80,21 +79,20 @@ unique_labels = set(labels)
 colors = [plt.cm.Spectral(each)
           for each in np.linspace(0, 1, len(unique_labels))]
 for k, col in zip(unique_labels, colors):
-    if k == -1:
+    if k != -1:
         # Black used for noise.
-        col = [0, 0, 0, 1]
+        #col = [0, 0, 0, 1]
 
-    class_member_mask = (labels == k)
+        class_member_mask = (labels == k)
 
 
-    xy = summation_X[class_member_mask & core_samples_mask]
+        xy = summation_X[class_member_mask & core_samples_mask]
+        plt.plot(xy,xy, 'o', markerfacecolor=tuple(col),
+                 markeredgecolor='k', markersize=14)
 
-    plt.plot(xy, 'o', markerfacecolor=tuple(col),
-             markeredgecolor='k', markersize=14)
-
-    xy = summation_X[class_member_mask & ~core_samples_mask]
-    plt.plot(xy, 'o', markerfacecolor=tuple(col),
-             markeredgecolor='k', markersize=6)
+        xy = summation_X[class_member_mask & ~core_samples_mask]
+        plt.plot(xy,xy, 'o', markerfacecolor=tuple(col),
+                 markeredgecolor='k', markersize=6)
 
 plt.title('Estimated number of clusters: %d' % n_clusters_)
 plt.show()
