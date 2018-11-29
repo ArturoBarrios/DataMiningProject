@@ -26,12 +26,12 @@ print(__doc__)
 # print("Y      ",y)
 ##########XY
 x_labels = []
-f = open("p_xlabels.txt","r")
+f = open("t_xlabels.txt","r")
 line = f.read()
 #x_labels = {"SepalLengthCm","SepalWidthCm","PetalLengthCm","PetalWidthCm"}
 for label in line.split(","):
     x_labels.append(label[1:len(label)-1])
-X, y, type2id = loader.load_data('Iris_p.csv', y_label="Species", x_labels=x_labels)
+X, y, type2id = loader.load_data('Iris_t.csv', y_label="Species", x_labels=x_labels)
 
 
 summation_X = []
@@ -53,7 +53,7 @@ X = np.array([np.array(xi)for xi in summation_X])
 
 ######XY
 
-range_n_clusters = [2, 3, 4,5,6]
+range_n_clusters = [2, 3,4,5,6]
 
 for n_clusters in range_n_clusters:
     # Create a subplot with 1 row and 2 columns

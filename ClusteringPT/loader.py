@@ -17,7 +17,7 @@ def load_data(filename, y_label, x_labels):
         data = []
         for row in reader:
             data.append(row)
-
+    
     # Change labels into indexes
     labels = set(d[y_label] for d in data)
     label2id = { label: i for i, label in enumerate(labels) }
